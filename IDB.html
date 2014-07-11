@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=10" />
+    <title>Offline test harness</title>
+
+    <script src="jquery-2.0.3.min.js"></script>
+    <script src="jquery.indexeddb.js"></script>
+    <style type="text/css">
+        pre {
+            background-color: ghostwhite;
+            border: 1px solid silver;
+            padding: 10px 20px;
+            margin: 20px;
+        }
+
+        .json-key {
+            color: brown;
+        }
+
+        .json-value {
+            color: navy;
+        }
+
+        .json-string {
+            color: olive;
+        }
+
+        .li-selected {
+            background-color: rgb(187, 194, 202);
+        }
+
+        .li-default {
+            background-color: inherit;
+        }
+
+        .anchor-default {
+            color: blue;
+            background-color: inherit;
+        }
+
+        .CSSTableGenerator {
+            margin: 0px;
+            padding: 0px;
+            width: auto;
+            -moz-border-radius-bottomleft: 10px;
+            -webkit-border-bottom-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+            -moz-border-radius-bottomright: 10px;
+            -webkit-border-bottom-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+            -moz-border-radius-topright: 10px;
+            -webkit-border-top-right-radius: 10px;
+            border-top-right-radius: 10px;
+            -moz-border-radius-topleft: 10px;
+            -webkit-border-top-left-radius: 10px;
+            border-top-left-radius: 10px;
+        }
+
+            .CSSTableGenerator table {
+                border-collapse: collapse;
+                border-spacing: 0;
+                width: auto;
+                height: auto;
+                margin: 0px;
+                padding: 0px;
+            }
+
+            .CSSTableGenerator tr:last-child td:last-child {
+                -moz-border-radius-bottomright: 10px;
+                -webkit-border-bottom-right-radius: 10px;
+                border-bottom-right-radius: 10px;
+            }
+
+            .CSSTableGenerator table tr:first-child td:first-child {
+                -moz-border-radius-topleft: 10px;
+                -webkit-border-top-left-radius: 10px;
+                border-top-left-radius: 10px;
+            }
+
+            .CSSTableGenerator table tr:first-child td:last-child {
+                -moz-border-radius-topright: 10px;
+                -webkit-border-top-right-radius: 10px;
+                border-top-right-radius: 10px;
+            }
+
+            .CSSTableGenerator tr:last-child td:first-child {
+                -moz-border-radius-bottomleft: 10px;
+                -webkit-border-bottom-left-radius: 10px;
+                border-bottom-left-radius: 10px;
+            }
+
+            .CSSTableGenerator tr:hover td {
+            }
+
+            .CSSTableGenerator tr:nth-child(odd) {
+                background-color: white;
+            }
+
+            .CSSTableGenerator tr:nth-child(even) {
+                background-color: #e5f5ff;
+            }
+
+            .CSSTableGenerator td {
+                vertical-align: middle;
+                border: 1px solid #B8AFAF;
+                border-width: 0px 1px 1px 0px;
+                text-align: left;
+                padding: 5px;
+                font-size: 10px;
+                font-family: Arial;
+                font-weight: normal;
+                color: #00007f;
+            }
+
+            .CSSTableGenerator tr:first-child td {
+                background: -o-linear-gradient(bottom, #cccccc 5%, #ffffff 100%);
+                background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #cccccc), color-stop(1, #ffffff) );
+                background: -moz-linear-gradient( center top, #cccccc 5%, #ffffff 100% );
+                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#cccccc", endColorstr="#ffffff");
+                background: -o-linear-gradient(top,#cccccc,ffffff);
+                background-color: #cccccc;
+                text-align: center;
+                border-width: 0px 0px 1px 1px;
+                font-size: 14px;
+                font-family: Arial;
+                font-weight: bold;
+                color: #000000;
+            }
+
+            .CSSTableGenerator tr:first-child:hover td {
+                background: -o-linear-gradient(bottom, #cccccc 5%, #ffffff 100%);
+                background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #cccccc), color-stop(1, #ffffff) );
+                background: -moz-linear-gradient( center top, #cccccc 5%, #ffffff 100% );
+                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#cccccc", endColorstr="#ffffff");
+                background: -o-linear-gradient(top,#cccccc,ffffff);
+                background-color: #cccccc;
+            }
+
+            .CSSTableGenerator tr:first-child td:first-child {
+                border-width: 0px 0px 1px 0px;
+            }
+    </style>
+</head>
+<body>
+    <input id="object_store_name" type="text" placeholder="Object store name" readonly="" style="display: none" />
+
+    <table style="vertical-align: bottom">
+        <tr>
+            <td>
+                <img src="Indexeddb.png" style="vertical-align: top;" /><input type="text" id="dbName" value="DBName" onkeyup="refreshDb(this)" style="width: auto" /><label id="dbVersion"></label>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div id="ObjectStores" style="list-style-type: none; padding-left: 15px;">
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <br />
+    <table id="addTable">
+        <tr>
+            <td>
+                <input type="button" id="btnAdd" value="Add" /></td>
+            <td>
+                <input id="keyInput" placeholder="Enter key" style="display: none" type="text" /></td>
+            <td>
+                <textarea id="jsonInput" rows="3" cols="70" placeholder="JSON string input"></textarea></td>
+        </tr>
+    </table>
+
+    <br />
+    <br />
+    <div id="Records" class="CSSTableGenerator">
+    </div>
+
+    <pre id="pre" style="display: none"><code id="Items"></code></pre>
+
+    <script type="text/javascript">
+        var db;
+        var dbName = $('#dbName').val();
+        var objectStoreKeyPathJson = {};
+
+        $(document).ready(function () {
+            if (!window.indexedDB) {
+                alert("Your browser doesn't support IndexedDB");
+            } else {
+                displayAllStores();
+            }
+        });
+
+        function refreshDb(object) {
+
+            // set the dbname and refer to this
+            dbName = object.value;
+
+            // clear UI
+            $('#ObjectStores').text('');
+            $("#dbVersion").text('');
+            $("#Records").text('');
+            $("#pre").css('display', 'none');
+            $("#addTable").css('display', 'none');
+
+            // display stores for changed dbname
+            displayAllStores();
+        };
+
+        function displayAllStores() {
+
+            var open_request = window.indexedDB.open(dbName);
+            open_request.onerror = function (event) {
+                console.log("Error opening the db: " + dbName);
+            };
+            open_request.onupgradeneeded = function (e) {
+                //debugger;
+
+                // check for newly created or upgraded db
+                db = e.target.result; // dont create a db if its not created by the actual app, rollback instead
+                if (!db.objectStoreNames.length) { // check if object stores are already created
+                    e.target.transaction.abort();
+                }
+            }
+            open_request.onsuccess = function (event) {
+                //debugger;
+                var db = event.target.result;
+
+                $("#dbVersion").append(" (Database Version:" + db.version + ")");
+                document.querySelector("#btnAdd").addEventListener("click", addRecord, false);
+
+                if (db.objectStoreNames.length > 0) {
+
+                    $("#addTable").css('display', 'block');
+                    var txn = db.transaction(db.objectStoreNames);
+
+                    txn.oncomplete = function (event) {
+                    };
+
+                    txn.onerror = function (event) {
+                        // handle error
+                    };
+
+                    for (var i = 0; i < db.objectStoreNames.length; i++) {
+                        var object_store_name = db.objectStoreNames.item(i);
+                        var object_store = txn.objectStore(object_store_name);
+
+                        var $li = $("<li></li>");
+                        var $img = $("<img style='padding-top: 3px;padding-left: 3px;padding-right: 3px;' />");
+                        $img.attr({ src: 'objectstore.png' });
+                        var $anchor = $("<a></a>");
+                        $anchor[0].href = "#";
+                        $anchor.addClass("anchor-default");
+                        var $actions = $('<span>[ <span class="actions"></span> ]</span>');
+                        var $action_clear = $('<a href="#">Clear</a>');
+                        $actions.find('.actions').append($action_clear);
+
+                        $img.appendTo($li);
+                        $anchor.appendTo($li);
+                        $actions.appendTo($li);
+
+                        $anchor.text(object_store_name);
+                        $anchor[0].onclick = function () {
+                            populateName(this, this.parentNode);
+                        };
+
+                        $anchor[0].onmouseover = function () {
+                            showKeyPathToolTip(this);
+                        };
+
+                        $action_clear[0].onclick = function () {
+                            clearObjectStore(this);
+                        };
+
+                        $('#ObjectStores').append($li);
+
+                        objectStoreKeyPathJson[object_store_name] = object_store.keyPath;
+                        //var auto = object_store.autoIncrement;
+                    }
+                    db.close();
+                }
+            }
+        }
+
+        function populateName(anchor, li) {
+            $('a').addClass("anchor-default");
+
+            // Highlight the selected span
+            $('li').addClass("li-default");
+            li.className = "li-selected";
+
+            $('#object_store_name').val(anchor.innerHTML);
+            readAllRecords();
+        };
+
+        function clearObjectStore(anchor) {
+            $('a').addClass("anchor-default");
+
+            // Highlight the selected span
+            var li = $(anchor).parents('li');
+            $('li').addClass("li-default");
+            li[0].className = "li-selected";
+
+            $('#object_store_name').val(li.children('.anchor-default:first').html());
+            $.indexedDB(dbName).objectStore($('#object_store_name').val()).clear().done(function () {
+                readAllRecords();
+            });
+        };
+
+        function showKeyPathToolTip(anchor) {
+            anchor.title = "Keypath: " + "'" + objectStoreKeyPathJson[anchor.text] + "'";
+        };
+
+        function showFormattedJSON(stringJSON) {
+            $('#pre').css("display", "block");
+
+            if (isValidJSON(stringJSON)) {
+                $('#Items').html(testharness.json.prettyPrint(JSON.parse(stringJSON)));
+            }
+        };
+
+        function deleteItem(key) {
+            var result = confirm("Are you sure you want to delete the key?");
+            if (result === true) {
+                //Logic to delete the item
+                var object_store_name = $('#object_store_name').val();
+
+                // delete
+                $.indexedDB(dbName).objectStore(object_store_name).delete(key).done(function () {
+                    console.log("Deleted key " + key + " from " + object_store_name + " store");
+                }).fail(function () {
+                    console.log("Error deleting the key: " + key);
+                });
+
+                // In IE, we cannot find from object store whether it has autoincrement true
+                // If the object store has autoIncrement -ing key, the key is generated by the user agent.
+                // In FF and Chrome, it is integer starting with 1. If you give valid key and convert your id to integer, your code run fine - tested in both FF and Chrome. '1' and 1 are different keys according to IndexedDB API key definition.
+                //Another issue IndexedDB API design. The delete methods always return to success event handler with undefined as result whether given key was deleted or not.
+                var autoIncrementId = parseInt(key, 10);
+                $.indexedDB(dbName).objectStore(object_store_name).delete(autoIncrementId).done(function () {
+                });
+            }
+
+            readAllRecords();
+        };
+
+        function readAllRecords() {
+            document.querySelector("#Records").innerHTML = '';
+            $('#jsonInput').text('');
+
+            $('#pre').css("display", "none");
+
+            var object_store_name = $('#object_store_name').val();
+
+            var transactionPromise = $.indexedDB(dbName).transaction(
+                        [object_store_name], "read");
+
+            var keyPath = objectStoreKeyPathJson[object_store_name];
+            if (!keyPath) {
+                $('#keyInput').css("display", "block");
+            } else {
+                $('#keyInput').css("display", "none");
+            }
+
+            transactionPromise.progress(function (trans) {
+
+                // Called when the transaction has started
+                var $table = $("<table></table>");
+                var $tr = $("<tr><td>Key (Keypath: " + keyPath + ")</td><td>Value</td></td><td colspan='3'>Actions</td></tr>");
+
+                $tr.appendTo($table);
+
+                var promise = trans.objectStore(object_store_name).each(function (item) {
+
+                    var keyPath = objectStoreKeyPathJson[object_store_name];
+
+                    var $textkey = $("<input type ='text'  value = " + item.key + "></input>");
+                    $textkey.width = "auto";
+
+                    var $textvalue = $("<textarea rows='3' cols='70'>" + JSON.stringify(item.value) + "</textarea>");
+                    var $deletebutton = $("<input type='submit' value='Delete'></input>");
+                    var $updatebutton = $("<input type='submit' value='Update'></input>");
+                    var $viewjsonbutton = $("<input type='submit' value='View JSON'></input>");
+
+                    // attach handlers to form a closure
+                    $viewjsonbutton[0].onclick = function () {
+                        showFormattedJSON($textvalue.val());
+                    };
+
+                    // attach handlers to form a closure
+                    $deletebutton[0].onclick = function () {
+                        deleteItem($textkey.val());
+                    };
+
+                    // attach handlers to form a closure
+                    $updatebutton[0].onclick = function () {
+                        updateObjectStore($textvalue.val(), $textkey.val());
+                    }
+
+                    var $row = $('<tr></tr>').appendTo($table);
+
+                    $('<td></td>').append($textkey).appendTo($row);
+                    $('<td></td>').append($textvalue).appendTo($row);
+                    $('<td></td>').append($deletebutton).appendTo($row);
+                    $('<td></td>').append($updatebutton).appendTo($row);
+                    $('<td></td>').append($viewjsonbutton).appendTo($row);
+
+                    // for object stores with keypath dont allow to enter the key
+                    if (keyPath) {
+                        $textkey.attr("readonly", "readonly");
+                        $textkey.css("color", "gray");
+                    }
+
+                    // Called for each element during the iteration
+                    if (item.value) {
+                        console.log(item.key, item.value);
+                        $('#Records').append($table);
+                    }
+                });
+            });
+
+            transactionPromise.done(function (/*event*/) {
+                console.log("Read Transaction completed");
+            });
+
+            transactionPromise.fail(function (/*event*/) {
+                console.log("Transaction failed/aborted");
+            });
+        };
+
+        function updateObjectStore(stringifiedJSON, key) {
+            var object_store_name = $('#object_store_name').val();
+
+            var transactionPromise = $.indexedDB(dbName).transaction(
+                        [object_store_name], "readwrite");
+
+            var keyPath = objectStoreKeyPathJson[object_store_name];
+
+            if (isValidJSON(stringifiedJSON)) {
+
+                var promise;
+                if (!keyPath) {
+
+                    promise = $.indexedDB(dbName).objectStore(object_store_name).put(JSON.parse(stringifiedJSON), key);
+                } else {
+                    promise = $.indexedDB(dbName).objectStore(object_store_name).put(JSON.parse(stringifiedJSON));
+                }
+                promise.done(function (result, event) {
+                    alert("Modified " + object_store_name + " store");
+                });
+
+                promise.fail(function (error, event) {
+                    alert("Failed modifying records in " + object_store_name + " store");
+                });
+            }
+
+            readAllRecords();
+        }
+
+        function addRecord() {
+            var stringifiedJSON = $('#jsonInput').val();
+            var key = $('#keyInput').val();
+            updateObjectStore(stringifiedJSON, key);
+        };
+
+        function isValidJSON(responseText) {
+            try {
+                var json = JSON.parse(responseText);
+                return true;
+            }
+            catch (e) {
+                alert('Please enter a valid JSON');
+                return false;
+            }
+        };
+
+        if (!testharness)
+            var testharness = {};
+
+        testharness.json = {
+            replacer: function (match, pIndent, pKey, pVal, pEnd) {
+                var key = '<span class=json-key>';
+                var val = '<span class=json-value>';
+                var str = '<span class=json-string>';
+                var r = pIndent || '';
+                if (pKey)
+                    r = r + key + pKey.replace(/[: ]/g, '') + '</span>: ';
+                if (pVal)
+                    r = r + (pVal[0] == '"' ? str : val) + pVal + '</span>';
+                return r + (pEnd || '');
+            },
+            prettyPrint: function (obj) {
+                var jsonLine = /^( *)("[\w]+": )?("[^"]*"|[\w.+-]*)?([,[{])?$/mg;
+                return JSON.stringify(obj, null, 3)
+                   .replace(/&/g, '&amp;').replace(/\\"/g, '&quot;')
+                   .replace(/</g, '&lt;').replace( />/g, '&gt;')
+                   .replace(jsonLine, testharness.json.replacer);
+            }
+        };
+    </script>
+</body>
+</html>
