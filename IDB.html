@@ -2,10 +2,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=10" />
-    <title>IndexedDB test harness</title>
+    <title>Offline test harness</title>
 
-    <script src="jquery-2.0.3.min.js"></script>
-    <script src="jquery.indexeddb.js"></script>
+    <script src="libs/jquery-2.0.3.min.js"></script>
+    <script src="libs/jquery.indexeddb.js"></script>
     <style type="text/css">
         pre {
             background-color: ghostwhite;
@@ -148,7 +148,7 @@
     <table style="vertical-align: bottom">
         <tr>
             <td>
-                <img src="Indexeddb.png" style="vertical-align: top;" /><input type="text" id="dbName" value="DBName" onkeyup="refreshDb(this)" style="width: auto" /><label id="dbVersion"></label>
+                <img style="vertical-align: top;" /><input type="text" id="dbName" value="DBName" onkeyup="refreshDb(this)" style="width: auto" /><label id="dbVersion"></label>
             </td>
         </tr>
         <tr>
@@ -247,7 +247,7 @@
 
                         var $li = $("<li></li>");
                         var $img = $("<img style='padding-top: 3px;padding-left: 3px;padding-right: 3px;' />");
-                        $img.attr({ src: 'objectstore.png' });
+                        //$img.attr({ src: 'objectstore.png' });
                         var $anchor = $("<a></a>");
                         $anchor[0].href = "#";
                         $anchor.addClass("anchor-default");
