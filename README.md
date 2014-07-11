@@ -2,6 +2,7 @@ IndexedDBViewer
 ===============
 
 This application displays the HTML5 indexedDB database for a given domain. 
-It lists the object stores and displays the data within the stores. 
+It lists the object stores and displays the data within the stores.
 This application is useful for a developer when using IE10 or IE11.
-The files in this application need to be deployed on the server, so that developers can open the Testharness.html page and view the indexedDB created on the domain.
+It provides CRUD operations to be carried out on the IndexedDB object stores.
+The files in this application need to be deployed on the server, so that developers can open the IDB.html page and view the indexedDB created on the domain.
